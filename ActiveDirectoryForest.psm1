@@ -34,3 +34,5 @@ function Get-ForestObjects
     )
     Get-ADObject $filter -SearchBase "$((Get-ADDomain (Get-ADForest).Name).DistinguishedName)" -server "$(((Get-ADForest).GlobalCatalogs)[0]):3268"
 }
+
+Export-ModuleMember -Function * -Variable * -Cmdlet *
