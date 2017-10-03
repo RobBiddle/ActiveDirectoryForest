@@ -14,6 +14,15 @@ function Get-ForestComputers ($Properties="Name")
     }
 }
 
+function Get-ForestGroups ($Properties="Name")
+{
+    (Get-ADForest).Domains | ForEach-Object {
+        ((Get-ADDomainController -Discover -DomainName $_ -ForceDiscover).HostName)[0] | ForEach-Object {
+            Get-ADGroup -Filter * -Server $_ -Properties $Properties
+        }       
+    }
+}
+
 function Get-ForestUsers ($Properties="Name")
 {
     (Get-ADForest).Domains | ForEach-Object {
