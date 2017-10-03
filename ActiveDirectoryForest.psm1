@@ -5,51 +5,76 @@
     }
 }
 
-function Get-ForestComputers ($Properties="Name")
+function Get-ForestComputers
 {
+    param (
+        #[Parameter(Mandatory=$true)]
+        [string]$filter="*",
+        [string]$Properties="Name"
+    )
     (Get-ADForest).Domains | ForEach-Object {
         ((Get-ADDomainController -Discover -DomainName $_ -ForceDiscover).HostName)[0] | ForEach-Object {
-            Get-ADComputer -Filter * -Server $_ -Properties $Properties
+            Get-ADComputer -Filter $filter -Server $_ -Properties $Properties
         }       
     }
 }
 
-function Get-ForestGroups ($Properties="Name")
+function Get-ForestGroups
 {
+    param (
+        #[Parameter(Mandatory=$true)]
+        [string]$filter="*",
+        [string]$Properties="Name"
+    )
     (Get-ADForest).Domains | ForEach-Object {
         ((Get-ADDomainController -Discover -DomainName $_ -ForceDiscover).HostName)[0] | ForEach-Object {
-            Get-ADGroup -Filter * -Server $_ -Properties $Properties
+            Get-ADGroup -Filter $filter -Server $_ -Properties $Properties
         }       
     }
 }
 
-function Get-ForestUsers ($Properties="Name")
+function Get-ForestUsers
 {
+    param (
+        #[Parameter(Mandatory=$true)]
+        [string]$filter="*",
+        [string]$Properties="Name"
+    )
     (Get-ADForest).Domains | ForEach-Object {
         ((Get-ADDomainController -Discover -DomainName $_ -ForceDiscover).HostName)[0]  | ForEach-Object {
-            Get-ADUser -Filter * -Server $_ -Properties $Properties
+            Get-ADUser -Filter $filter -Server $_ -Properties $Properties
         }
     }    
 }
 
-function Get-ForestComputerObjects ($Properties="Name")
+function Get-ForestComputerObjects
 {
-    Get-ADObject -Filter 'ObjectClass -eq "computer"' -SearchBase "$((Get-ADDomain (Get-ADForest).Name).DistinguishedName)" -server "$(((Get-ADForest).GlobalCatalogs)[0]):3268" -Properties $Properties
+    param (
+        #[Parameter(Mandatory=$true)]
+        [string]$filter='ObjectClass -eq "computer"',
+        [string]$Properties="Name"
+    )
+    Get-ADObject -Filter $filter -SearchBase "$((Get-ADDomain (Get-ADForest).Name).DistinguishedName)" -server "$(((Get-ADForest).GlobalCatalogs)[0]):3268" -Properties $Properties
 }
 
-function Get-ForestUserObjects ($Properties="Name")
+function Get-ForestUserObjects
 {
-    Get-ADObject -Filter 'ObjectClass -eq "user"' -SearchBase "$((Get-ADDomain (Get-ADForest).Name).DistinguishedName)" -server "$(((Get-ADForest).GlobalCatalogs)[0]):3268" -Properties $Properties
+    param (
+        #[Parameter(Mandatory=$true)]
+        [string]$filter='ObjectClass -eq "user"',
+        [string]$Properties="Name"
+    )
+    Get-ADObject -Filter $filter -SearchBase "$((Get-ADDomain (Get-ADForest).Name).DistinguishedName)" -server "$(((Get-ADForest).GlobalCatalogs)[0]):3268" -Properties $Properties
 }
 
 function Get-ForestObjects
 {
     param (
-        [Parameter(Mandatory=$true)]
-        [string]$filter,
+        #[Parameter(Mandatory=$true)]
+        [string]$filter="*",
         [string]$Properties="Name"
     )
-    Get-ADObject $filter -SearchBase "$((Get-ADDomain (Get-ADForest).Name).DistinguishedName)" -server "$(((Get-ADForest).GlobalCatalogs)[0]):3268" -Properties $Properties
+    Get-ADObject -Filter $filter -SearchBase "$((Get-ADDomain (Get-ADForest).Name).DistinguishedName)" -server "$(((Get-ADForest).GlobalCatalogs)[0]):3268" -Properties $Properties
 }
 
 Export-ModuleMember -Function * -Variable * -Cmdlet *
